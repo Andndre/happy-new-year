@@ -11,6 +11,7 @@ use super::{vel_min_max, Firework, Rocket, GRAVITY, PARTICLE_COUNT, PARTICLE_LIF
 /* This struct represents firework of which the explosion gradually changes
  * colour over its lifetime. */
 pub struct ColourShiftFirework {
+    name: String,
     rocket: Particle,
     exploded: bool,
     particles: Vec<Particle>,
@@ -34,7 +35,7 @@ impl Rocket for ColourShiftFirework {
     }
 
     /* Dictate the explosion behaviour. */
-    fn explode(&mut self) -> () {
+    unsafe fn explode(&mut self) -> () {
         self.exploded = true;
 
         let radius = 1.5 + Math::random() * 1.5;
@@ -49,7 +50,7 @@ impl Rocket for ColourShiftFirework {
     }
 
     /* Simulate the explosion for one step. */
-    fn sim_explosion(&mut self, width: u32, height: u32) -> () {
+    unsafe fn sim_explosion(&mut self, width: u32, height: u32) -> () {
         self.particles.iter_mut().for_each(|particle| {
             particle.apply_force(GRAVITY);
             particle.step();
@@ -70,6 +71,7 @@ impl Rocket for ColourShiftFirework {
             let alpha = lifetime_frac.powi(2);
 
             particle.draw_rgba(
+                &self.name,
                 context,
                 /* Mix the two colours together in the right amount. */
                 colour::colour_add(
@@ -83,7 +85,7 @@ impl Rocket for ColourShiftFirework {
     }
 
     /* Reset the explosion. */
-    fn reset_explosion(&mut self) -> () {
+    unsafe fn reset_explosion(&mut self) -> () {
         self.exploded = false;
         self.particles.clear();
         self.first_colour = random_colour();
@@ -94,10 +96,11 @@ impl Rocket for ColourShiftFirework {
 
 impl ColourShiftFirework {
     /* Create new firework at random position on the bottom, with random colour. */
-    pub fn new(width: u32, height: u32) -> Self {
+    pub unsafe fn new(name: String, width: u32, height: u32) -> Self {
         let (vel_min, vel_max) = vel_min_max(height);
 
         Self {
+            name,
             rocket: Particle::new(
                 TwoVec::new(Math::random() * width as f64, height as f64),
                 TwoVec::new(0., vel_min + (vel_max - vel_min) * Math::random()),

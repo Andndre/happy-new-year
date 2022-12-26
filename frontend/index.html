@@ -1,13 +1,26 @@
 <html>
-
-<head>
+  <head>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
-    <script src="index.js" type="module"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<body>
+  <body>
     <canvas id="fireworks" width="1920" height="1080"></canvas>
-</body>
-
+    <div class="center">
+      <div>
+        <h1>Happy new year 2023!</h1>
+        <p>
+          Your name will be displayed when your firework rocket explodes. Your
+          fireworks will automatically be spawned when you are online.
+        </p>
+      </div>
+    </div>
+    <div class="popup close" id="wyn">
+      <h3>What is your name?</h3>
+      <p id="wyn-message"></p>
+      <input type="text" placeholder="Unique Name" id="wyn-input" />
+      <button id="wyn-button">Join</button>
+    </div>
+    <script defer src="index.js" type="module"></script>
+  </body>
 </html>

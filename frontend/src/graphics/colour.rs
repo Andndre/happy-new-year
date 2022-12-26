@@ -6,7 +6,7 @@ pub const YELLOW: Colour = (200, 200, 0);
 pub const ORANGE: Colour = (255, 200, 0);
 
 /* Generate a random colour. */
-pub fn random_colour() -> Colour {
+pub unsafe fn random_colour() -> Colour {
     (
         (Math::random() * 255.) as u8,
         (Math::random() * 255.) as u8,

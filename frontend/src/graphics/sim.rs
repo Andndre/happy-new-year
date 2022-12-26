@@ -19,7 +19,7 @@ impl TwoVec {
     }
 
     /* Create a vector with random direction and given magnitude. */
-    pub fn random(magnitude: f64) -> Self {
+    pub unsafe fn random(magnitude: f64) -> Self {
         let phi = Math::random() * f64::consts::TAU;
 
         Self::new(phi.cos() * magnitude, phi.sin() * magnitude)
@@ -104,7 +104,7 @@ impl Particle {
     }
 
     /* Create a particle at a given point with given speed and random velocity. */
-    pub fn random_at(pos: TwoVec, speed: f64) -> Particle {
+    pub unsafe fn random_at(pos: TwoVec, speed: f64) -> Particle {
         Self {
             pos: pos,
             vel: TwoVec::random(speed),
@@ -126,13 +126,20 @@ impl Particle {
     }
 
     /* Draw the particle on a canvas with a given colour. */
-    pub fn draw(&self, context: &CanvasRenderingContext2d, colour: Colour, radius: f64) {
-        self.draw_rgba(context, colour, 1., radius);
+    pub fn draw(
+        &self,
+        name: String,
+        context: &CanvasRenderingContext2d,
+        colour: Colour,
+        radius: f64,
+    ) {
+        self.draw_rgba(&name, context, colour, 1., radius);
     }
 
     /* Draw the particle on a canvas with a given colour and translucency. */
     pub fn draw_rgba(
         &self,
+        name: &String,
         context: &CanvasRenderingContext2d,
         colour: Colour,
         alpha: f64,
@@ -143,6 +150,12 @@ impl Particle {
         context.set_fill_style(&wasm_bindgen::JsValue::from_str(&rgba_to_colour(
             colour, alpha,
         )));
+
+        context.set_font("13px sans-serif");
+
+        context
+            .fill_text(name, self.pos.x(), self.pos.y() + 10f64)
+            .unwrap();
 
         context
             .arc(
