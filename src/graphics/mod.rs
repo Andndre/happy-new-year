@@ -34,6 +34,10 @@ impl Graphics {
         let stars = Vec::new();
         let fireworks = Vec::new();
 
+        context.set_fill_style(&JsValue::from_str("yellow"));
+        context.set_text_baseline("middle");
+        context.set_text_align("center");
+
         Self {
             canvas,
             context,
@@ -60,22 +64,24 @@ impl Graphics {
     }
 
     /* Create the stars. */
-    pub fn init(&mut self) {
+    pub unsafe fn init(&mut self) {
         // Generate the stars
         self.create_stars(STAR_COUNT, self.canvas.width(), self.canvas.height());
     }
 
     /* Spawn a firework, depending on what types of firework there are. */
-    pub fn spawn_firework(&mut self) {
+    pub unsafe fn spawn_firework(&mut self, name: String) {
         match self.fireworks.len() % 2 {
             0 => {
                 self.fireworks.push(Box::from(StandardFirework::new(
+                    name,
                     self.canvas.width(),
                     self.canvas.height(),
                 )));
             }
             1 => {
                 self.fireworks.push(Box::from(ColourShiftFirework::new(
+                    name,
                     self.canvas.width(),
                     self.canvas.height(),
                 )));
@@ -103,30 +109,17 @@ impl Graphics {
         for firework in &self.fireworks {
             firework.draw(&self.context);
         }
-
-        self.context.set_fill_style(&JsValue::from_str("yellow"));
-        self.context.set_text_baseline("middle");
-        self.context.set_text_align("center");
-        self.context.set_font("70px sans-serif");
-
-        self.context
-            .fill_text(
-                "Gelukkig Nieuwjaar!",
-                self.canvas.width() as f64 / 2.,
-                self.canvas.height() as f64 / 2.,
-            )
-            .unwrap();
     }
 
     /* Simulate the fireworks. */
-    pub fn step(&mut self) {
+    pub unsafe fn step(&mut self) {
         for firework in &mut self.fireworks {
             firework.step(self.canvas.width(), self.canvas.height());
         }
     }
 
     /* Create stars at random positions on the canvas. */
-    fn create_stars(&mut self, count: u32, canvas_width: u32, canvas_height: u32) {
+    unsafe fn create_stars(&mut self, count: u32, canvas_width: u32, canvas_height: u32) {
         for _ in 0..count {
             let pos = Particle::new(
                 TwoVec::new(
@@ -143,7 +136,12 @@ impl Graphics {
     /* This function draws the stars on the canvas. */
     fn draw_stars(&self) {
         for star in &self.stars {
-            star.draw(&self.context, colour::YELLOW, STAR_RADIUS);
+            star.draw(
+                (&"").to_string(),
+                &self.context,
+                colour::YELLOW,
+                STAR_RADIUS,
+            );
         }
     }
 }

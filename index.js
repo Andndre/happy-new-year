@@ -1,33 +1,59 @@
-import init, { draw, spawn_firework, resize_canvas } from './pkg/new_years.js';
+import init, { draw, spawn_firework, resize_canvas } from "./pkg/new_years.js";
 
-let firework_counter = 0;
-let firework_spawner_handle = 0;
-
-/* Limit the amount of fireworks based on window width. */
-let max_fireworks = window.innerWidth / 100;
+let name = "";
+function askForNameThenJoin(ws) {
+  const popup = document.getElementById("wyn");
+  popup.classList.toggle("close");
+  document.getElementById("wyn-button").onclick = () => {
+    name = document.getElementById("wyn-input").value;
+    if (name.trim() === "") return;
+    localStorage.setItem("name", name);
+    ws.send(JSON.stringify({ type: "join", name }));
+    popup.classList.toggle("close");
+  };
+}
 
 async function run() {
-    await init();
+  await init();
 
-    setInterval(draw, 10);
+  const ws = new WebSocket("ws://localhost:8888");
 
-    firework_spawner_handle = setInterval(() => {
-        spawn_firework();
-        firework_counter += 1;
-
-        /* Spawn until the max firework amount is reached. */
-
-        if (firework_counter >= max_fireworks) {
-            clearInterval(firework_spawner_handle);
-        }
-        /* Spawn fireworks in regular intervals such that the maximum is reached
-         * in 5 seconds. */
-    }, 5000 / max_fireworks);
-
-    /* Change the canvas resolution when the window is resized. */
-    window.onresize = (event) => {
-        resize_canvas()
+  ws.onopen = () => {
+    ws.onmessage = (ev) => {
+      const message = JSON.parse(ev.data);
+      switch (message.type) {
+        case "connected":
+          document.getElementById("wyn-message").innerText =
+            "Introduce yourself to the world";
+          name = localStorage.getItem("name") ?? "";
+          if (!name) {
+            askForNameThenJoin(ws);
+            break;
+          }
+          ws.send(JSON.stringify({ type: "join", name }));
+          break;
+        case "error":
+          if (message.error === "name_already_exist") {
+            document.getElementById("wyn-message").innerText =
+              "That username already exist";
+            askForNameThenJoin(ws);
+          }
+          break;
+        case "launch":
+          spawn_firework(message.name);
+          break;
+        case "join":
+          spawn_firework(message.name);
+      }
     };
+  };
+
+  setInterval(draw, 10);
+
+  /* Change the canvas resolution when the window is resized. */
+  window.onresize = (_event) => {
+    resize_canvas();
+  };
 }
 
 run();

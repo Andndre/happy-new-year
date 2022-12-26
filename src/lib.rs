@@ -7,7 +7,7 @@ static mut GRAPHICS: Option<graphics::Graphics> = None;
 
 /* Initialize the simulation. */
 #[wasm_bindgen(start)]
-pub fn start() {
+pub unsafe fn start() {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
 
@@ -32,7 +32,7 @@ pub fn start() {
 
 /* Draw the current state of the simulation, and simulate one step. */
 #[wasm_bindgen]
-pub fn draw() {
+pub unsafe fn draw() {
     /* This is only unsafe when aquiring multiple muteable references,
      * but the reference is immediately dropped, so this is safe. */
     if let Some(graphics) = unsafe { GRAPHICS.as_mut() } {
@@ -44,11 +44,11 @@ pub fn draw() {
 
 /* Spawn a new firework. */
 #[wasm_bindgen]
-pub fn spawn_firework() {
+pub unsafe fn spawn_firework(name: String) {
     /* This is only unsafe when aquiring multiple muteable references,
      * but the reference is immediately dropped, so this is safe. */
     if let Some(graphics) = unsafe { GRAPHICS.as_mut() } {
-        graphics.spawn_firework();
+        graphics.spawn_firework(name);
     }
 }
 

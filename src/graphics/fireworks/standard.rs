@@ -11,6 +11,7 @@ use super::vel_min_max;
 
 /* This struct represents a plain firework with one colour.. */
 pub struct StandardFirework {
+    name: String,
     rocket: Particle,
     exploded: bool,
     particles: Vec<Particle>,
@@ -33,7 +34,7 @@ impl Rocket for StandardFirework {
     }
 
     /* Explode the firework. */
-    fn explode(&mut self) -> () {
+    unsafe fn explode(&mut self) -> () {
         self.exploded = true;
 
         let radius = 1.5 + Math::random() * 1.5;
@@ -48,7 +49,7 @@ impl Rocket for StandardFirework {
     }
 
     /* Simulate one step of the explosion. */
-    fn sim_explosion(&mut self, width: u32, height: u32) -> () {
+    unsafe fn sim_explosion(&mut self, width: u32, height: u32) -> () {
         self.particles.iter_mut().for_each(|particle| {
             particle.apply_force(GRAVITY);
             particle.step();
@@ -65,6 +66,7 @@ impl Rocket for StandardFirework {
     fn draw_explosion(&self, context: &CanvasRenderingContext2d) -> () {
         for particle in &self.particles {
             particle.draw_rgba(
+                &self.name,
                 context,
                 self.colour,
                 (self.lifetime as f64) / (PARTICLE_LIFETIME as f64),
@@ -74,7 +76,7 @@ impl Rocket for StandardFirework {
     }
 
     /* Reset the explosion. */
-    fn reset_explosion(&mut self) -> () {
+    unsafe fn reset_explosion(&mut self) -> () {
         self.exploded = false;
         self.particles.clear();
         self.colour = colour::random_colour();
@@ -84,10 +86,11 @@ impl Rocket for StandardFirework {
 
 impl StandardFirework {
     /* Create new firework at random position on the bottom, with random colour. */
-    pub fn new(width: u32, height: u32) -> Self {
+    pub unsafe fn new(name: String, width: u32, height: u32) -> Self {
         let (vel_min, vel_max) = vel_min_max(height);
 
         Self {
+            name,
             rocket: Particle::new(
                 TwoVec::new(Math::random() * width as f64, height as f64),
                 TwoVec::new(0., vel_min + (vel_max - vel_min) * Math::random()),

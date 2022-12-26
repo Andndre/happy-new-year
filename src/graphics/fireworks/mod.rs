@@ -9,7 +9,7 @@ use super::sim::{Particle, TwoVec};
 
 const PARTICLE_COUNT: u32 = 20;
 
-const PARTICLE_LIFETIME: u32 = 70;
+const PARTICLE_LIFETIME: u32 = 140;
 
 const ROCKET_EXPLODE_SPEED: f64 = -2.;
 
@@ -17,10 +17,10 @@ pub const GRAVITY: TwoVec = TwoVec::new(0., 0.07);
 
 pub trait Firework {
     /* Reset the firework. */
-    fn reset(&mut self, width: u32, height: u32);
+    unsafe fn reset(&mut self, width: u32, height: u32);
 
     /* Simulate one step of the firework. */
-    fn step(&mut self, width: u32, height: u32);
+    unsafe fn step(&mut self, width: u32, height: u32);
 
     /* Draw the firework. */
     fn draw(&self, context: &CanvasRenderingContext2d);
@@ -34,13 +34,13 @@ pub trait Rocket {
     fn rocket(&self) -> &Particle;
 
     fn exploded(&self) -> bool;
-    fn explode(&mut self) -> ();
+    unsafe fn explode(&mut self) -> ();
 
-    fn sim_explosion(&mut self, width: u32, height: u32) -> ();
+    unsafe fn sim_explosion(&mut self, width: u32, height: u32) -> ();
 
     fn draw_explosion(&self, context: &CanvasRenderingContext2d) -> ();
 
-    fn reset_explosion(&mut self) -> ();
+    unsafe fn reset_explosion(&mut self) -> ();
 }
 
 /* Implement the firework trait for a struct with the Rocket trait.. */
@@ -49,7 +49,7 @@ where
     T: Rocket,
 {
     /* Reset the rocket in its entirety. */
-    fn reset(&mut self, width: u32, height: u32) {
+    unsafe fn reset(&mut self, width: u32, height: u32) {
         let (vel_min, vel_max) = vel_min_max(height);
 
         self.rocket_mut()
@@ -63,7 +63,7 @@ where
     }
 
     /* Simulate one step of the rocket. */
-    fn step(&mut self, width: u32, height: u32) -> () {
+    unsafe fn step(&mut self, width: u32, height: u32) -> () {
         if !self.exploded() {
             self.rocket_mut().apply_force(GRAVITY);
             self.rocket_mut().step();
@@ -80,7 +80,8 @@ where
     /* Draw the rocket or its explosion. */
     fn draw(&self, context: &CanvasRenderingContext2d) -> () {
         if !self.exploded() {
-            self.rocket().draw(context, colour::ORANGE, 2.3);
+            self.rocket()
+                .draw("".to_string(), context, colour::ORANGE, 2.3);
         } else {
             self.draw_explosion(context);
         }
