@@ -106,7 +106,7 @@ impl Particle {
     /* Create a particle at a given point with given speed and random velocity. */
     pub unsafe fn random_at(pos: TwoVec, speed: f64) -> Particle {
         Self {
-            pos: pos,
+            pos,
             vel: TwoVec::random(speed),
             acc: TwoVec::zero(),
         }
