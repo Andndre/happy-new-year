@@ -8,7 +8,7 @@ function askForNameThenJoin(ws) {
     name = document.getElementById("wyn-input").value;
     if (name.trim() === "") return;
     localStorage.setItem("name", name);
-    ws.send(JSON.stringify({ type: "join", name }));
+    ws.send(JSON.stringify({ type: "join", name, new: true }));
     popup.classList.toggle("close");
   };
 }
