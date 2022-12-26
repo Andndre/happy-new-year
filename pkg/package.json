@@ -1,0 +1,15 @@
+{
+  "name": "new_years",
+  "collaborators": [
+    "Jonas van der Schaaf <niet@jonasvanderschaaf.nl>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "new_years_bg.wasm",
+    "new_years.js",
+    "new_years.d.ts"
+  ],
+  "module": "new_years.js",
+  "types": "new_years.d.ts",
+  "sideEffects": false
+}
