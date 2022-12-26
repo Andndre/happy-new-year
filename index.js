@@ -16,7 +16,7 @@ function askForNameThenJoin(ws) {
 async function run() {
   await init();
 
-  const ws = new WebSocket("ws://localhost:8888");
+  const ws = new WebSocket("wss://happy-new-year.deno.dev");
 
   ws.onopen = () => {
     ws.onmessage = (ev) => {
