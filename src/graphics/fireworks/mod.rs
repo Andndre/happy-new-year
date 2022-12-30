@@ -2,7 +2,10 @@ mod colour_shift;
 mod standard;
 
 use js_sys::Math;
+use rand::seq::SliceRandom;
 use web_sys::CanvasRenderingContext2d;
+
+use crate::LAUNCH_SOUNDS;
 
 use super::colour;
 use super::sim::{Particle, TwoVec};
@@ -51,6 +54,12 @@ where
     /* Reset the rocket in its entirety. */
     unsafe fn reset(&mut self, width: u32, height: u32) {
         let (vel_min, vel_max) = vel_min_max(height);
+
+        let sound = LAUNCH_SOUNDS.choose(&mut rand::thread_rng()).unwrap();
+        sound.set_current_time(0f64);
+        if let Err(_res) = sound.play() {
+            panic!("Cannot play sound");
+        }
 
         self.rocket_mut()
             .set_pos(TwoVec::new(Math::random() * width as f64, height as f64));

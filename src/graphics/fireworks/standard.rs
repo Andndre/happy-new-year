@@ -1,6 +1,9 @@
 use colour::random_colour;
 use js_sys::Math;
+use rand::seq::SliceRandom;
 use web_sys::CanvasRenderingContext2d;
+
+use crate::EXPLOTION_SOUNDS;
 
 use super::super::colour;
 use super::super::colour::Colour;
@@ -36,7 +39,11 @@ impl Rocket for StandardFirework {
     /* Explode the firework. */
     unsafe fn explode(&mut self) -> () {
         self.exploded = true;
-
+        let sound = EXPLOTION_SOUNDS.choose(&mut rand::thread_rng()).unwrap();
+        sound.set_current_time(0f64);
+        if let Err(_res) = sound.play() {
+            panic!("Cannot play sound");
+        }
         let radius = 1.5 + Math::random() * 1.5;
 
         /* Create the explosion. */
