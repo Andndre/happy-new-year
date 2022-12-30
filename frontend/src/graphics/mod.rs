@@ -5,11 +5,14 @@ mod sim;
 use core::panic;
 
 use js_sys::Math;
+use rand::seq::SliceRandom;
 use wasm_bindgen::{JsCast, JsValue};
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
 use fireworks::{ColourShiftFirework, Firework, StandardFirework};
 use sim::{Particle, TwoVec};
+
+use crate::LAUNCH_SOUNDS;
 
 const STAR_RADIUS: f64 = 2.;
 const STAR_COUNT: u32 = 20;
@@ -71,6 +74,11 @@ impl Graphics {
 
     /* Spawn a firework, depending on what types of firework there are. */
     pub unsafe fn spawn_firework(&mut self, name: String) {
+        let sound = LAUNCH_SOUNDS.choose(&mut rand::thread_rng()).unwrap();
+        sound.set_current_time(0f64);
+        if let Err(_res) = sound.play() {
+            panic!("Cannot play sound");
+        }
         match self.fireworks.len() % 2 {
             0 => {
                 self.fireworks.push(Box::from(StandardFirework::new(
