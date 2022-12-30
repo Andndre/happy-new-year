@@ -9,7 +9,7 @@ use rand::seq::SliceRandom;
 use wasm_bindgen::{JsCast, JsValue};
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
-use fireworks::{ColourShiftFirework, Firework, StandardFirework};
+use fireworks::{ColourShiftFirework, Firework, SparkleFirework, StandardFirework};
 use sim::{Particle, TwoVec};
 
 use crate::LAUNCH_SOUNDS;
@@ -79,7 +79,7 @@ impl Graphics {
         if let Err(_res) = sound.play() {
             panic!("Cannot play sound");
         }
-        match self.fireworks.len() % 2 {
+        match self.fireworks.len() % 4 {
             0 => {
                 self.fireworks.push(Box::from(StandardFirework::new(
                     name,
@@ -88,7 +88,21 @@ impl Graphics {
                 )));
             }
             1 => {
+                self.fireworks.push(Box::from(StandardFirework::new(
+                    name,
+                    self.canvas.width(),
+                    self.canvas.height(),
+                )));
+            }
+            2 => {
                 self.fireworks.push(Box::from(ColourShiftFirework::new(
+                    name,
+                    self.canvas.width(),
+                    self.canvas.height(),
+                )));
+            }
+            3 => {
+                self.fireworks.push(Box::from(SparkleFirework::new(
                     name,
                     self.canvas.width(),
                     self.canvas.height(),
